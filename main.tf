@@ -16,5 +16,5 @@ output "aws_route53_record" {
 }
 
 output "aws_alb_listener_https" {
-  value = aws_alb_listener.https[0].arn
+  value = length(aws_alb_listener.https) > 0 ? aws_alb_listener.https[0].arn : null
 }
