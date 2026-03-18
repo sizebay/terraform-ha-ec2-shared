@@ -5,6 +5,8 @@ locals {
   suffix          = var.environment != "" ? var.environment : var.aws_region
   cannonical_name = join("-", [local.app_name, local.suffix])
   config_prefix   = var.config_prefix != "" ? var.config_prefix : local.app_name
+  create_alb      = !var.aws_use_shared_alb
+  shared_alb_name = "shared-alb-${var.environment}"
 }
 
 # Input Variables
@@ -56,8 +58,9 @@ variable "aws_lb_health_check_type" {
 }
 
 variable "aws_lb_subnet_ids" {
-  description = "AWS Subnet IDs in which your load balancer will be placed on."
+  description = "AWS Subnet IDs in which your load balancer will be placed on. Not required when aws_use_shared_alb is true."
   type        = list(string)
+  default     = []
 }
 
 variable "aws_lb_health_check_url" {
@@ -77,6 +80,12 @@ variable "aws_lb_deregistration_delay" {
 
 variable "aws_lb_is_internal" {
   description = "Defines whether the ALB is internal or not. Default: false"
+  default     = false
+}
+
+variable "aws_use_shared_alb" {
+  description = "Quando true, o modulo nao cria ALB e usa o ALB shared existente (shared-alb-{environment}) com listener rules."
+  type        = bool
   default     = false
 }
 

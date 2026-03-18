@@ -1,29 +1,68 @@
-# Load Balancer
-resource "aws_alb" "default" {
-  name = local.cannonical_name
+# Shared ALB data sources
+data "aws_lb" "shared" {
+  count = local.create_alb ? 0 : 1
+  name  = local.shared_alb_name
+}
 
-  security_groups    = [aws_security_group.load_balancer.id]
+data "aws_lb_listener" "shared_http" {
+  count             = local.create_alb ? 0 : 1
+  load_balancer_arn = data.aws_lb.shared[0].arn
+  port              = 80
+}
+
+data "aws_lb_listener" "shared_https" {
+  count             = !local.create_alb && !var.aws_lb_is_internal ? 1 : 0
+  load_balancer_arn = data.aws_lb.shared[0].arn
+  port              = 443
+}
+
+locals {
+  alb_dns_name      = local.create_alb ? aws_alb.default[0].dns_name : data.aws_lb.shared[0].dns_name
+  alb_zone_id       = local.create_alb ? aws_alb.default[0].zone_id  : data.aws_lb.shared[0].zone_id
+  http_listener_arn  = local.create_alb ? aws_alb_listener.http[0].arn : data.aws_lb_listener.shared_http[0].arn
+  https_listener_arn = !var.aws_lb_is_internal ? (local.create_alb ? aws_alb_listener.https[0].arn : data.aws_lb_listener.shared_https[0].arn) : ""
+}
+
+# Shared Load Balancer
+resource "aws_alb" "default" {
+  count = local.create_alb ? 1 : 0
+  name  = local.shared_alb_name
+
+  security_groups    = [aws_security_group.load_balancer[0].id]
   load_balancer_type = "application"
   internal           = var.aws_lb_is_internal
 
   subnets = var.aws_lb_subnet_ids
 }
 
+moved {
+  from = aws_alb.default
+  to   = aws_alb.default[0]
+}
+
 resource "aws_alb_listener" "http" {
-  load_balancer_arn = aws_alb.default.arn
+  count             = local.create_alb ? 1 : 0
+  load_balancer_arn = aws_alb.default[0].arn
 
   port     = 80
   protocol = "HTTP"
 
+  # Internal: default 404
   dynamic "default_action" {
     for_each = var.aws_lb_is_internal ? [1] : []
 
     content {
-      type             = "forward"
-      target_group_arn = aws_alb_target_group.default.arn
+      type = "fixed-response"
+
+      fixed_response {
+        content_type = "text/plain"
+        message_body = "Not Found"
+        status_code  = "404"
+      }
     }
   }
 
+  # External: default redirect to HTTPS
   dynamic "default_action" {
     for_each = var.aws_lb_is_internal ? [] : [1]
 
@@ -31,17 +70,22 @@ resource "aws_alb_listener" "http" {
       type = "redirect"
 
       redirect {
-        port        = aws_alb_listener.https[0].port
-        protocol    = aws_alb_listener.https[0].protocol
+        port        = "443"
+        protocol    = "HTTPS"
         status_code = "HTTP_301"
       }
     }
   }
 }
 
+moved {
+  from = aws_alb_listener.http
+  to   = aws_alb_listener.http[0]
+}
+
 resource "aws_alb_listener" "https" {
-  count    = var.aws_lb_is_internal ? 0 : 1
-  load_balancer_arn = aws_alb.default.arn
+  count             = local.create_alb && !var.aws_lb_is_internal ? 1 : 0
+  load_balancer_arn = aws_alb.default[0].arn
 
   port       = 443
   protocol   = "HTTPS"
@@ -50,8 +94,46 @@ resource "aws_alb_listener" "https" {
   certificate_arn = data.aws_acm_certificate.wildcard[0].arn
 
   default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not Found"
+      status_code  = "404"
+    }
+  }
+}
+
+# Listener rules (host-based routing) - always created
+resource "aws_lb_listener_rule" "http" {
+  count        = var.aws_lb_is_internal ? 1 : 0
+  listener_arn = local.http_listener_arn
+
+  action {
     type             = "forward"
     target_group_arn = aws_alb_target_group.default.arn
+  }
+
+  condition {
+    host_header {
+      values = [local.fqdns_domain]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "https" {
+  count        = var.aws_lb_is_internal ? 0 : 1
+  listener_arn = local.https_listener_arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.default.arn
+  }
+
+  condition {
+    host_header {
+      values = [local.fqdns_domain]
+    }
   }
 }
 

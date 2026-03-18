@@ -32,6 +32,7 @@ resource "aws_security_group" "instances" {
 }
 
 resource "aws_security_group" "load_balancer" {
+  count       = local.create_alb ? 1 : 0
   name        = "${local.cannonical_name}-load-balancer"
   description = "Managed by Terraform"
   vpc_id      = data.aws_vpc.default.id
@@ -60,4 +61,9 @@ resource "aws_security_group" "load_balancer" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+moved {
+  from = aws_security_group.load_balancer
+  to   = aws_security_group.load_balancer[0]
 }

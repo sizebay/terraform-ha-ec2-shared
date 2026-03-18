@@ -3,12 +3,12 @@
  */
 
 data "aws_route53_zone" "domain" {
-  name = "${var.aws_hosted_domain}."
+  name         = "${var.aws_hosted_domain}."
   private_zone = var.aws_lb_is_internal
 }
 
 data "aws_acm_certificate" "wildcard" {
-  count    = var.aws_lb_is_internal ? 0 : 1
+  count    = local.create_alb && !var.aws_lb_is_internal ? 1 : 0
   domain   = "*.${var.aws_hosted_domain}"
   statuses = ["ISSUED"]
 }
@@ -19,8 +19,8 @@ resource "aws_route53_record" "default" {
   type    = "A"
 
   alias {
-    name                   = aws_alb.default.dns_name
-    zone_id                = aws_alb.default.zone_id
+    name                   = local.alb_dns_name
+    zone_id                = local.alb_zone_id
     evaluate_target_health = true
   }
 }
