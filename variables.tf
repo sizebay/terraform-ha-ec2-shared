@@ -16,7 +16,7 @@ variable "aws_region" {
 
 variable "aws_instance_type" {
   description = "AWS EC2 instance type that will be used to spin up the service. Default: t3.nano"
-  default     = "t3.nano"
+  default     = "t3.medium"
 }
 
 variable "aws_instances_subnet_ids" {
@@ -80,6 +80,12 @@ variable "aws_lb_deregistration_delay" {
 
 variable "aws_lb_is_internal" {
   description = "Defines whether the ALB is internal or not. Default: false"
+  default     = false
+}
+
+variable "dns_private_zone" {
+  description = "Defines whether the Route53 hosted zone is private or not. Default: false"
+  type        = bool
   default     = false
 }
 

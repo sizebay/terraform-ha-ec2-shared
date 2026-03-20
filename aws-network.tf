@@ -37,15 +37,11 @@ resource "aws_security_group" "load_balancer" {
   description = "Managed by Terraform"
   vpc_id      = data.aws_vpc.default.id
 
-  dynamic "ingress" {
-    for_each = var.aws_lb_is_internal ? [0] : [1]
-
-    content {
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
