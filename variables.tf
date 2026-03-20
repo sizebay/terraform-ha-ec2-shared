@@ -6,7 +6,7 @@ locals {
   cannonical_name = join("-", [local.app_name, local.suffix])
   config_prefix   = var.config_prefix != "" ? var.config_prefix : local.app_name
   create_alb      = !var.aws_use_shared_alb
-  shared_alb_name = "shared-alb-${var.environment}"
+  shared_alb_name = "${var.aws_lb_is_internal ? "interno-apps" : "internet-facing-apps"}-${var.environment}"
 }
 
 # Input Variables
