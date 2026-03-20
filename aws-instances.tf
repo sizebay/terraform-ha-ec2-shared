@@ -55,6 +55,18 @@ resource "aws_launch_template" "default" {
       volume_size = 8
     }
   }
+  block_device_mappings {
+    device_name = "/dev/sda1"
+
+    ebs {
+      volume_size           = 8
+      volume_type           = "gp3"
+      encrypted             = true
+      throughput            = 125
+      iops                  = 3000
+      delete_on_termination = true
+    }
+  }
 
   iam_instance_profile {
     arn = aws_iam_instance_profile.default.arn

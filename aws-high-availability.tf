@@ -17,8 +17,8 @@ data "aws_lb_listener" "shared_https" {
 }
 
 locals {
-  alb_dns_name      = local.create_alb ? aws_alb.default[0].dns_name : data.aws_lb.shared[0].dns_name
-  alb_zone_id       = local.create_alb ? aws_alb.default[0].zone_id  : data.aws_lb.shared[0].zone_id
+  alb_dns_name       = local.create_alb ? aws_alb.default[0].dns_name : data.aws_lb.shared[0].dns_name
+  alb_zone_id        = local.create_alb ? aws_alb.default[0].zone_id : data.aws_lb.shared[0].zone_id
   http_listener_arn  = local.create_alb ? aws_alb_listener.http[0].arn : data.aws_lb_listener.shared_http[0].arn
   https_listener_arn = !var.aws_lb_is_internal ? (local.create_alb ? aws_alb_listener.https[0].arn : data.aws_lb_listener.shared_https[0].arn) : ""
 }
