@@ -16,7 +16,7 @@ variable "aws_region" {
 
 variable "aws_instance_type" {
   description = "AWS EC2 instance type that will be used to spin up the service. Default: t3.nano"
-  default     = "t3.medium"
+  default     = "t3.nano"
 }
 
 variable "aws_instances_subnet_ids" {
