@@ -6,7 +6,8 @@ locals {
   cannonical_name = join("-", [local.app_name, local.suffix])
   config_prefix   = var.config_prefix != "" ? var.config_prefix : local.app_name
   create_alb      = !var.aws_use_shared_alb
-  shared_alb_name = "${var.aws_lb_is_internal ? "interno-apps" : "internet-facing-apps"}-${var.environment}"
+  shared_alb_env  = replace(var.environment, "/^.*-/", "")
+  shared_alb_name = var.aws_shared_alb_name != "" ? var.aws_shared_alb_name : "${var.aws_lb_is_internal ? "interno-apps" : "internet-facing-apps"}-${local.shared_alb_env}"
 }
 
 # Input Variables
@@ -87,6 +88,12 @@ variable "dns_private_zone" {
   description = "Defines whether the Route53 hosted zone is private or not. Default: false"
   type        = bool
   default     = false
+}
+
+variable "aws_shared_alb_name" {
+  description = "Nome customizado do ALB shared. Se vazio, usa o nome padrao baseado em aws_lb_is_internal e environment."
+  type        = string
+  default     = ""
 }
 
 variable "aws_use_shared_alb" {
