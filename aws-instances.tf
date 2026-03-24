@@ -51,12 +51,19 @@ resource "aws_launch_template" "default" {
 
   block_device_mappings {
     device_name = "/dev/sda1"
+
     ebs {
-      volume_size = 8
+      volume_size           = 8
+      volume_type           = "gp3"
+      encrypted             = true
+      throughput            = 125
+      iops                  = 3000
+      delete_on_termination = true
     }
   }
+
   block_device_mappings {
-    device_name = "/dev/sda1"
+    device_name = "/dev/xvda"
 
     ebs {
       volume_size           = 8
