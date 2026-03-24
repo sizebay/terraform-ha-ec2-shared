@@ -33,6 +33,10 @@ resource "aws_alb" "default" {
   internal           = var.aws_lb_is_internal
 
   subnets = var.aws_lb_subnet_ids
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 moved {
