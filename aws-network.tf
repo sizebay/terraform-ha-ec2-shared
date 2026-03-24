@@ -16,13 +16,6 @@ resource "aws_security_group" "instances" {
     cidr_blocks = [data.aws_vpc.default.cidr_block]
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -33,7 +26,7 @@ resource "aws_security_group" "instances" {
 
 resource "aws_security_group" "load_balancer" {
   count       = local.create_alb ? 1 : 0
-  name        = "${local.cannonical_name}-load-balancer"
+  name        = "${local.shared_alb_name}-load-balancer"
   description = "Managed by Terraform"
   vpc_id      = data.aws_vpc.default.id
 
