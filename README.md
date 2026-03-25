@@ -76,7 +76,7 @@ module "second-service" {
 | aws\_lb\_deregistration\_delay | Draining phase delay for graceful shutdown. | string | `"60"` | no |
 | aws\_lb\_enable\_stickiness | Defines ALB should be routed to the same target. | bool | `false` | no |
 | aws\_lb\_cookie\_duration | The time period in seconds for stickiness cookie. | number | `60` | no |
-| aws\_instance\_type | AWS EC2 instance type. | string | `"t3.medium"` | no |
+| aws\_instance\_type | AWS EC2 instance type. | string | `"t3.nano"` | no |
 | aws\_instance\_web\_port | Port mapped from the ALB to target instance. | string | `"8080"` | no |
 | aws\_instance\_web\_protocol | Protocol mapped from the ALB to target instance. | string | `"HTTP"` | no |
 | aws\_deployment\_config | AWS CodeDeploy deployment config. | string | `"CodeDeployDefault.OneAtATime"` | no |
