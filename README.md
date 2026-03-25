@@ -67,6 +67,9 @@ module "second-service" {
 | aws\_use\_shared\_alb | Quando true, usa o ALB shared existente (shared-alb-{environment}) com listener rules. | bool | `false` | no |
 | aws\_lb\_subnet\_ids | AWS Subnet IDs for the load balancer. Not required when aws\_use\_shared\_alb is true. | list(string) | `[]` | no |
 | aws\_lb\_is\_internal | Defines whether the ALB is internal or not. | bool | `false` | no |
+| aws\_lb\_enable\_https | Habilita listener HTTPS com certificado TLS no ALB. | bool | `true` | no |
+| dns\_private\_zone | Define se a zona Route53 e privada ou publica. | bool | `false` | no |
+| aws\_shared\_alb\_name | Nome customizado do ALB shared. Se vazio, usa nome padrao. | string | `""` | no |
 | aws\_lb\_health\_check\_url | URL ALB should probe to ensure the instances are healthy. | string | `"/health-check"` | no |
 | aws\_lb\_health\_check\_type | Define how AWS should check if instances are healthy or not. | string | `"ELB"` | no |
 | aws\_lb\_health\_check\_grace\_period | Grace period before the instance being checked. | string | `"30"` | no |
