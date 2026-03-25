@@ -7,7 +7,7 @@ locals {
   config_prefix   = var.config_prefix != "" ? var.config_prefix : local.app_name
   create_alb      = !var.aws_use_shared_alb
   shared_alb_env  = replace(var.environment, "/^.*-/", "")
-  shared_alb_name = var.aws_shared_alb_name != "" ? var.aws_shared_alb_name : "${var.aws_lb_is_internal ? "internal-apps" : "internet-facing-apps"}-${local.shared_alb_env}"
+  shared_alb_name = var.aws_shared_alb_name != "" ? var.aws_shared_alb_name : "${var.aws_lb_is_internal ? "interno-apps" : "internet-facing-apps"}-${local.shared_alb_env}"
 }
 
 # Input Variables
