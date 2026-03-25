@@ -67,13 +67,16 @@ module "second-service" {
 | aws\_use\_shared\_alb | Quando true, usa o ALB shared existente (shared-alb-{environment}) com listener rules. | bool | `false` | no |
 | aws\_lb\_subnet\_ids | AWS Subnet IDs for the load balancer. Not required when aws\_use\_shared\_alb is true. | list(string) | `[]` | no |
 | aws\_lb\_is\_internal | Defines whether the ALB is internal or not. | bool | `false` | no |
+| aws\_lb\_enable\_https | Habilita listener HTTPS com certificado TLS no ALB. | bool | `true` | no |
+| dns\_private\_zone | Define se a zona Route53 e privada ou publica. | bool | `false` | no |
+| aws\_shared\_alb\_name | Nome customizado do ALB shared. Se vazio, usa nome padrao. | string | `""` | no |
 | aws\_lb\_health\_check\_url | URL ALB should probe to ensure the instances are healthy. | string | `"/health-check"` | no |
 | aws\_lb\_health\_check\_type | Define how AWS should check if instances are healthy or not. | string | `"ELB"` | no |
 | aws\_lb\_health\_check\_grace\_period | Grace period before the instance being checked. | string | `"30"` | no |
 | aws\_lb\_deregistration\_delay | Draining phase delay for graceful shutdown. | string | `"60"` | no |
 | aws\_lb\_enable\_stickiness | Defines ALB should be routed to the same target. | bool | `false` | no |
 | aws\_lb\_cookie\_duration | The time period in seconds for stickiness cookie. | number | `60` | no |
-| aws\_instance\_type | AWS EC2 instance type. | string | `"t3.nano"` | no |
+| aws\_instance\_type | AWS EC2 instance type. | string | `"t3.medium"` | no |
 | aws\_instance\_web\_port | Port mapped from the ALB to target instance. | string | `"8080"` | no |
 | aws\_instance\_web\_protocol | Protocol mapped from the ALB to target instance. | string | `"HTTP"` | no |
 | aws\_deployment\_config | AWS CodeDeploy deployment config. | string | `"CodeDeployDefault.OneAtATime"` | no |
