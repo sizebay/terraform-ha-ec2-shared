@@ -90,6 +90,12 @@ variable "dns_private_zone" {
   default     = false
 }
 
+variable "aws_lb_enable_https" {
+  description = "Habilita listener HTTPS com certificado TLS no ALB. Default: true"
+  type        = bool
+  default     = true
+}
+
 variable "aws_shared_alb_name" {
   description = "Nome customizado do ALB shared. Se vazio, usa o nome padrao baseado em aws_lb_is_internal e environment."
   type        = string

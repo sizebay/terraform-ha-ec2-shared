@@ -8,7 +8,7 @@ data "aws_route53_zone" "domain" {
 }
 
 data "aws_acm_certificate" "wildcard" {
-  count    = local.create_alb ? 1 : 0
+  count    = local.create_alb && var.aws_lb_enable_https ? 1 : 0
   domain   = "*.${var.aws_hosted_domain}"
   statuses = ["ISSUED"]
 }
