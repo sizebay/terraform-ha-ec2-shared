@@ -11,7 +11,7 @@ data "aws_lb_listener" "shared_http" {
 }
 
 data "aws_lb_listener" "shared_https" {
-  count             = !local.create_alb ? 1 : 0
+  count             = !local.create_alb && var.aws_lb_enable_https ? 1 : 0
   load_balancer_arn = data.aws_lb.shared[0].arn
   port              = 443
 }
@@ -20,7 +20,7 @@ locals {
   alb_dns_name       = local.create_alb ? aws_alb.default[0].dns_name : data.aws_lb.shared[0].dns_name
   alb_zone_id        = local.create_alb ? aws_alb.default[0].zone_id : data.aws_lb.shared[0].zone_id
   http_listener_arn  = local.create_alb ? aws_alb_listener.http[0].arn : data.aws_lb_listener.shared_http[0].arn
-  https_listener_arn = local.create_alb ? aws_alb_listener.https[0].arn : data.aws_lb_listener.shared_https[0].arn
+  https_listener_arn = var.aws_lb_enable_https ? (local.create_alb ? aws_alb_listener.https[0].arn : data.aws_lb_listener.shared_https[0].arn) : ""
 }
 
 # Shared Load Balancer
@@ -34,9 +34,9 @@ resource "aws_alb" "default" {
 
   subnets = var.aws_lb_subnet_ids
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 moved {
@@ -51,13 +51,31 @@ resource "aws_alb_listener" "http" {
   port     = 80
   protocol = "HTTP"
 
-  default_action {
-    type = "redirect"
+  dynamic "default_action" {
+    for_each = var.aws_lb_enable_https ? [1] : []
 
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    content {
+      type = "redirect"
+
+      redirect {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+  }
+
+  dynamic "default_action" {
+    for_each = var.aws_lb_enable_https ? [] : [1]
+
+    content {
+      type = "fixed-response"
+
+      fixed_response {
+        content_type = "text/plain"
+        message_body = "Not Found"
+        status_code  = "404"
+      }
     }
   }
 }
@@ -68,7 +86,7 @@ moved {
 }
 
 resource "aws_alb_listener" "https" {
-  count             = local.create_alb ? 1 : 0
+  count             = local.create_alb && var.aws_lb_enable_https ? 1 : 0
   load_balancer_arn = aws_alb.default[0].arn
 
   port       = 443
@@ -88,9 +106,25 @@ resource "aws_alb_listener" "https" {
   }
 }
 
-# Listener rules (host-based routing) - always created
+# Listener rules (host-based routing)
+resource "aws_lb_listener_rule" "http" {
+  count        = !var.aws_lb_enable_https ? 1 : 0
+  listener_arn = local.http_listener_arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.default.arn
+  }
+
+  condition {
+    host_header {
+      values = [local.fqdns_domain]
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "https" {
-  count        = 1
+  count        = var.aws_lb_enable_https ? 1 : 0
   listener_arn = local.https_listener_arn
 
   action {
