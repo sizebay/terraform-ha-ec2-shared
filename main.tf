@@ -12,7 +12,7 @@ output "aws_iam_role_name" {
 }
 
 output "aws_route53_record" {
-  value = aws_route53_record.default.name
+  value = length(aws_route53_record.default) > 0 ? aws_route53_record.default[0].name : null
 }
 
 output "aws_alb_listener_https" {

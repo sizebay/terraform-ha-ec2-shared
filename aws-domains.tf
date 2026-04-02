@@ -3,6 +3,7 @@
  */
 
 data "aws_route53_zone" "domain" {
+  count        = var.create_dns_record ? 1 : 0
   name         = "${var.aws_hosted_domain}."
   private_zone = var.dns_private_zone
 }
@@ -14,7 +15,8 @@ data "aws_acm_certificate" "wildcard" {
 }
 
 resource "aws_route53_record" "default" {
-  zone_id = data.aws_route53_zone.domain.zone_id
+  count   = var.create_dns_record ? 1 : 0
+  zone_id = data.aws_route53_zone.domain[0].zone_id
   name    = local.fqdns_domain
   type    = "A"
 

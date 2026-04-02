@@ -165,3 +165,9 @@ variable "environment" {
 variable "iam_statement_polices" {
   description = "Set new statement polices array"
 }
+
+variable "create_dns_record" {
+  description = "When false, skips Route53 hosted zone lookup and DNS record creation. Useful for environments without a hosted zone."
+  type        = bool
+  default     = true
+}

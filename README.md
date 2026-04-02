@@ -71,6 +71,7 @@ module "second-service" {
 | dns\_private\_zone | Define se a zona Route53 e privada ou publica. | bool | `false` | no |
 | aws\_shared\_alb\_name | Nome customizado do ALB shared. Se vazio, usa nome padrao. | string | `""` | no |
 | aws\_lb\_health\_check\_url | URL ALB should probe to ensure the instances are healthy. | string | `"/health-check"` | no |
+| create\_dns\_record | When false, skips Route53 lookup and DNS record creation. Useful for environments without a hosted zone. | bool | `true` | no |
 | aws\_lb\_health\_check\_type | Define how AWS should check if instances are healthy or not. | string | `"ELB"` | no |
 | aws\_lb\_health\_check\_grace\_period | Grace period before the instance being checked. | string | `"30"` | no |
 | aws\_lb\_deregistration\_delay | Draining phase delay for graceful shutdown. | string | `"60"` | no |
@@ -97,7 +98,7 @@ module "second-service" {
 | aws\_asg\_arn | The Auto Scaling Group ARN |
 | aws\_iam\_role\_arn | The IAM Role ARN |
 | aws\_iam\_role\_name | The IAM Role Name |
-| aws\_route53\_record | The Route53 record name |
+| aws\_route53\_record | The Route53 record name (null when create\_dns\_record is false) |
 | aws\_alb\_listener\_https | The HTTPS listener ARN (created or shared) |
 | aws\_alb\_arn | The ALB ARN in use (created or shared) |
 | aws\_alb\_dns\_name | The ALB DNS name in use (created or shared) |
