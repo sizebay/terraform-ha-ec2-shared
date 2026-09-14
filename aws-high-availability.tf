@@ -91,7 +91,7 @@ resource "aws_alb_listener" "https" {
 
   port       = 443
   protocol   = "HTTPS"
-  ssl_policy = "ELBSecurityPolicy-2016-08"
+  ssl_policy = var.ssl_policy
 
   certificate_arn = data.aws_acm_certificate.wildcard[0].arn
 
@@ -118,7 +118,7 @@ resource "aws_lb_listener_rule" "http" {
 
   condition {
     host_header {
-      values = [local.fqdns_domain]
+      values = concat([local.fqdns_domain], var.alb_host_headers_ex)
     }
   }
 }
@@ -134,7 +134,7 @@ resource "aws_lb_listener_rule" "https" {
 
   condition {
     host_header {
-      values = [local.fqdns_domain]
+      values = concat([local.fqdns_domain], var.alb_host_headers_ex)
     }
   }
 }

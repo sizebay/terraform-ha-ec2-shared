@@ -165,3 +165,13 @@ variable "environment" {
 variable "iam_statement_polices" {
   description = "Set new statement polices array"
 }
+
+variable "ssl_policy" {
+  description = "ALB ssl policy. Ex: ELBSecurityPolicy-TLS13-1-2-2021-06"
+  default = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+}
+
+variable "alb_host_headers_ex" {
+  description = "ALB host headers extra redirect"
+  default = []
+}
